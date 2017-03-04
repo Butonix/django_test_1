@@ -6,29 +6,15 @@
 </head>
 <body>
 
-{%if not user_name %}
-    <form action="{% url 'login' %}" method = "post">{% csrf_token %}
-     {{login_form.as_p}}
-     <input type="submit" value="Submit" />
-    </form>
-
-    <hr>
-{% else %}
-    {{user_name}}
-    <form action = "{% url 'logout' %}" method = "post">{% csrf_token %}
-        <input type="submit" value="logout">
-        <input type="hidden" name="url" value = "{% url 'home' %}">
-    </form>
-    <hr>
-    <a href = "{% url 'blog:new_post'%}"> new posts </a><br>
-{% endif %}
+{% include "login_form_inline.html" %}
+<hr>
 
 <a href = "{% url 'admin:login' %}" >admin</a><br>
 <a href = "{% url 'blog:feed' %}" >feed</a><br>
 <a href = "{% url 'blog:post_list'%}"> posts </a><br>
 <a href = "{% url 'blog:users'%}"> users </a><br>
 <hr>
-<a href = "{% url 'login2'%}"> login2 </a><br>
+<a href = "{% url 'login'%}"> login2 </a><br>
 
 {{redirect_url}}
 </body>

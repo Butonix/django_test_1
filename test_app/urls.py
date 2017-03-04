@@ -26,5 +26,4 @@ urlpatterns = [
     url(r'blog/', include('blog.urls', namespace='blog')),
     url(r'^logout$', views.Logout.as_view(), name='logout'),
     url(r'^login$', views.Login2.as_view(), name='login'),
-    url(r'^login2$', views.Login2.as_view(), name='login2'),
 ]
