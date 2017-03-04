@@ -14,7 +14,7 @@ class Main(generic.TemplateView):
             context['user_name'] = self.request.user.username
         else:
             context['user_name'] = ''
-            context['login_form'] = LoginForm(initial={'redirect_url': self.request.path})
+            context['login_form'] = LoginForm()
         return context
 
 
