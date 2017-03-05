@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{object.username}}</title>
+</head>
+<body>
+
+{{object}}
+
+<hr>
+
+{% if is_subscribed %}
+<form action="{% url 'blog:unsubscribe' %}" method="post" >{% csrf_token %}
+    {{subscribe_form}}
+    <input type="hidden" name="redirect_url" value="{{request.path}}"/>
+    <input type="submit" value="Отписаться"/>
+</form>
+
+{% else %}
+<form action="{% url 'blog:subscribe' %}" method="post" >{% csrf_token %}
+    {{subscribe_form}}
+    <input type="hidden" name="redirect_url" value="{{request.path}}"/>
+    <input type="submit" value="Подписаться"/>
+</form>
+{% endif %}
+
+<hr>
+<table border = "0"  cellpadding="2" cellspacing="4" >
+ <tr bgcolor="ddaaff">
+    <td>Title</td><td>Date</td>
+    </tr>
+    {% for post in list_posts %}
+    <tr>
+    <td><a href ="{% url 'blog:post' post.id %}">{{post.title}}</a> </td><td> {{post.date}} </td>
+    </tr>
+    {% endfor %}
+
+
+</table>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Лента</title>
+</head>
+<body>
+{% if not object_list %}
+Лента пуста
+{% endif %}
+
+{% for feed in object_list %}
+<p><a href="{% url 'blog:post' feed.post.id %}"> {{feed.post.author}}  {{feed.post.title}}  {{feed.post.date}}</a> </p>
+{% endfor %}
+</body>
+</html>

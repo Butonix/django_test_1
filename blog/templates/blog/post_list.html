@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои посты</title>
+</head>
+<body>
+
+
+<a href="{% url  'blog:new_post' %}">new post</a>
+
+
+<table border = "0"  cellpadding="2" cellspacing="4" >
+ <tr bgcolor="ddaaff">
+    <td>Title</td><td>Date</td>
+    </tr>
+    {% for post in list_posts %}
+    <tr>
+    <td><a href ="{% url 'blog:post' post.id %}">{{post.title}}</a> </td><td> {{post.date}} </td>
+    </tr>
+    {% endfor %}
+
+
+</table>
+</body>
+</html>

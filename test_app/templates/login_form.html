@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-    <form action="{% url 'login2' %}" method = "post">{% csrf_token %}
+    <form action="{% url 'login' %}" method = "post">{% csrf_token %}
          {{form.as_p}}
          <input type="submit" value="Submit" />
     </form>

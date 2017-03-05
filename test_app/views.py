@@ -43,7 +43,6 @@ class Login2(generic.FormView):
 class Logout(generic.View):
 
     def post(self, request, *args, **kwargs):
-        print('============== logout ')
         logout(request)
         url_ = request.POST.get('redirect_url', default="/")
         print(url_)

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои подписки</title>
+</head>
+<body>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Подписки</title>
+</head>
+<body>
+{% if object_list %}
+    {% for x in object_list %}
+<hr>
+    {{x.blog.username}}
+    <form action="{% url 'blog:unsubscribe' %}" method="post">{% csrf_token %}
+        <input id="id_blog" name="blog" type="hidden" value="{{x.blog.id}}">
+        <input type="hidden" name="redirect_url" value="{{request.path}}"/>
+        <input type="submit" value="отписаться"/>
+    </form>
+
+    {% endfor %}
+{% else %}
+Список пуст
+{% endif %}
+</body>
+</html>
+
+</body>
+</html>
