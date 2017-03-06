@@ -1,8 +1,9 @@
 from django.views import generic
 from django.contrib.auth import login, logout, authenticate
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+
 
 class Main(generic.TemplateView):
     template_name = 'main.html'
@@ -23,21 +24,23 @@ class LoginForm(forms.Form):
     pass_ = forms.CharField(label='Пароль', widget=forms.PasswordInput())
 
 
-class Login2(generic.FormView):
+class Login(generic.FormView):
 
     form_class = LoginForm
     template_name = 'login_form.html'
 
     def form_valid(self, form):
+        print('++=======LOGIN')
         login_ = form.cleaned_data['login_']
         pass_ = form.cleaned_data['pass_']
         redirect_url = self.request.POST.get('redirect_url', default="/")
-        #form.cleaned_data['redirect_url']
+
         user = authenticate(username=login_, password=pass_)
         if user:
             login(self.request, user)
             return redirect(redirect_url)
-        return redirect('/err')  # обработать неправильные данные
+        print('dsfsdaf')
+        return render(self.request, 'error.html', {'error': 'неправильные логин/пароль'})  # обработать неправильные данные
 
 
 class Logout(generic.View):

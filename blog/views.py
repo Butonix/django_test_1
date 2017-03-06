@@ -3,7 +3,7 @@ from django import forms
 from blog import models
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
-
+from django.core import exceptions
 
 class ListPosts(generic.ListView):
     model = models.Post
@@ -21,7 +21,7 @@ class NewPost(generic.CreateView):
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        instance.owner = self.request.user
+        instance.author = self.request.user
         instance.save()
         return redirect(self.success_url)
 
@@ -32,7 +32,10 @@ class DetailPost(generic.DetailView):
 
 
 class ListFeed(generic.ListView):
-    model = models.Feed
+   # model = models.Feed
+
+    def get_queryset(self):
+        return models.Feed.objects.filter(subscriber=self.request.user)
 
 
 class DetailUser(generic.DetailView):
@@ -65,8 +68,10 @@ class Unsubscribe(generic.FormView):
         subscriber = self.request.user
 
         # удаляем из списка подписчиков
-        models.Subscribers.objects.get(blog=blog, subscriber=subscriber).delete()
-
+        try:
+            models.Subscribers.objects.get(blog=blog, subscriber=subscriber).delete()
+        except exceptions.ObjectDoesNotExist as a:
+            return render(self.request, 'blog/error.html', {'error': 'Подписки несуществует'})
         # очищаем ленту
         models.Feed.objects.filter(subscriber=subscriber, post__author=blog).delete()
         return redirect(redirect_url)
@@ -110,20 +115,10 @@ class ListUsers(generic.ListView):
 
 class SubscribesList(generic.ListView):
 
-    def get_context_data(self, **kwargs):
-        context = super(generic.ListView, self).get_context_data(**kwargs)
-        context['subscribe_form'] = SubscribeForm()
-        return context
-
     def get_queryset(self):
-        return models.Subscribers.objects.all()
+        return models.Subscribers.objects.filter(subscriber=self.request.user)
 
-    def post(self, request, *args, **kwargs):
-        x = self.request.user.id
-        blog = kwargs['pk']
 
-        print('subscribe user {} to blog {}'.format(x, blog))
-        return redirect('/')
 
 
 

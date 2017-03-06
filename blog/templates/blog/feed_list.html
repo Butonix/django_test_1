@@ -7,10 +7,18 @@
 <body>
 {% if not object_list %}
 Лента пуста
-{% endif %}
 
+{% else %}
+<table>
 {% for feed in object_list %}
-<p><a href="{% url 'blog:post' feed.post.id %}"> {{feed.post.author}}  {{feed.post.title}}  {{feed.post.date}}</a> </p>
+<tr>
+    <td><a href="{% url 'blog:user' feed.post.author_id %}"> {{feed.post.author}} </a></td>
+    <td><a href="{% url 'blog:post' feed.post.id %}">  {{feed.post.title}} </a></td>
+    <td>    {{feed.post.date| date:"d.m.Y H:i:s"}}</td>
+</tr>
 {% endfor %}
+
+</table>
+{% endif %}
 </body>
 </html>

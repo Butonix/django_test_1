@@ -1,9 +1,11 @@
+
 {% if user_name %}
-    {{user_name}}    <br>
+   {{user_name}}
     <form action="{% url 'logout' %}" method="post">{% csrf_token %}
         <input type="hidden" value="{{request.path}}" name="redirect_url"/>
         <input type="submit" value="Выход" />
     </form>
+
 {% else %}
     <form action="{% url 'login' %}" method="post">{% csrf_token %}
         {{login_form.as_p}}

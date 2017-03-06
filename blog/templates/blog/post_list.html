@@ -7,7 +7,7 @@
 <body>
 
 
-<a href="{% url  'blog:new_post' %}">new post</a>
+<h2><a href="{% url  'blog:new_post' %}">Новый пост</a></h2>
 
 
 <table border = "0"  cellpadding="2" cellspacing="4" >
@@ -16,7 +16,7 @@
     </tr>
     {% for post in list_posts %}
     <tr>
-    <td><a href ="{% url 'blog:post' post.id %}">{{post.title}}</a> </td><td> {{post.date}} </td>
+    <td><a href ="{% url 'blog:post' post.id %}">{{post.title}}</a> </td><td> {{post.date| date:"d.m.Y H:i:s"}} </td>
     </tr>
     {% endfor %}
 
