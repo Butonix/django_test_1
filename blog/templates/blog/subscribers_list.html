@@ -4,32 +4,32 @@
     <meta charset="UTF-8">
     <title>Мои подписки</title>
 </head>
+<style>
+    .list_item{
+    float: left;
+    padding-right: 20px;
+    }
+</style>
 <body>
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Подписки</title>
-</head>
-<body>
+{% include "blog/menu_inline.html" %}
+<div id="data">
 {% if object_list %}
     {% for x in object_list %}
-<hr>
-    {{x.blog.username}}
-    <form action="{% url 'blog:unsubscribe' %}" method="post">{% csrf_token %}
-        <input id="id_blog" name="blog" type="hidden" value="{{x.blog.id}}">
+<p>
+    <a href="{% url 'blog:user' x.blog.id %}" class="list_item"> {{x.blog.username}} </a>
+
+
+
+     <form action="{% url 'blog:delete_subscribe' x.id %}" method="post">{% csrf_token %}
         <input type="hidden" name="redirect_url" value="{{request.path}}"/>
         <input type="submit" value="отписаться"/>
     </form>
 
+</p>
     {% endfor %}
 {% else %}
 Список пуст
 {% endif %}
-</body>
-</html>
-
+</div>
 </body>
 </html>

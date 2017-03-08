@@ -11,14 +11,14 @@
 <h2>
 
 
-<a href = "{% url 'blog:users'%}"> Пользователи </a><br>
-<hr>
+
     {% if user_name %}
 <a href = "{% url 'admin:login' %}" >admin</a><br><br>
-<a href = "{% url 'blog:feed' %}" >Лента</a><br><br>
-<a href = "{% url 'blog:post_list'%}"> Мои посты </a><br><br>
-<a href = "{% url 'blog:subscribes_list'%}"> Подписки </a><br><br>
+
+
     {% endif %}
+
+    <a href = "{% url 'blog:feed' %}" >Блог</a><br><br>
 </h2>
 </body>
 </html>

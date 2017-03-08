@@ -14,25 +14,47 @@ class ListPosts(generic.ListView):
         return models.Post.objects.filter(author=self.request.user.id)
 
 
-class NewPost(generic.CreateView):
+class PostForm(forms.Form):
     model = models.Post
-    fields = ['title', 'text']
-    success_url = '/'
+
+    title = forms.CharField(label='',
+                            widget=forms.TextInput(attrs={'id': 'ti'}))
+    text = forms.CharField(label='',
+                           widget=forms.Textarea(attrs={'id': 'ta'}))
+
+
+class DeletePost(generic.DeleteView):
+    model = models.Post
+
+    def get_success_url(self):
+        return self.request.POST.get('redirect_url', default='/')
+
+
+class NewPost(generic.FormView):
+    model = models.Post
+    template_name = 'blog/post_form.html'
+    form_class = PostForm
 
     def form_valid(self, form):
-        instance = form.save(commit=False)
-        instance.author = self.request.user
-        instance.save()
-        return redirect(self.success_url)
+        title = form.cleaned_data['title']
+        text = form.cleaned_data['text']
+        author = self.request.user
+        redirect_url = self.request.POST.get('redirect_url', default='/')
+        models.Post(text=text, title=title, author=author).save()
+        return redirect(redirect_url)
+
+    def form_invalid(self, form):
+        return render(self.request, 'error.html', {'error': 'ошибки в заполнении формы'})
+
+
+
 
 
 class DetailPost(generic.DetailView):
     model = models.Post
-    context_object_name = 'post'
 
 
 class ListFeed(generic.ListView):
-   # model = models.Feed
 
     def get_queryset(self):
         return models.Feed.objects.filter(subscriber=self.request.user)
@@ -43,71 +65,38 @@ class DetailUser(generic.DetailView):
     template_name = "blog/user_detail.html"
 
     def get_context_data(self, **kwargs):
-
         context = super(generic.DetailView, self).get_context_data(**kwargs)
         user = context['object']
         context['list_posts'] = models.Post.objects.filter(author=user)
-        context['subscribe_form'] = SubscribeForm(initial={'blog': user.id})
+        context['subscribe_form'] = SubscribeForm(initial={'blog': user.id,
+                                                           'subscriber': self.request.user.id})
         context['is_subscribed'] = models.Subscribers.objects.filter(
             blog=user, subscriber=self.request.user).exists()
-
         return context
 
 
 class SubscribeForm(forms.Form):
     blog = forms.CharField(widget=forms.HiddenInput)
-    #model = models.Subscribers
+    subscriber = forms.CharField(widget=forms.HiddenInput)
 
 
-class Unsubscribe(generic.FormView):
-    form_class = SubscribeForm
+class DeleteSubscribe(generic.DeleteView):
+    model = models.Subscribers
 
-    def form_valid(self, form):
-        redirect_url = self.request.POST.get('redirect_url', default='/')
-        blog = User.objects.get(id=form.cleaned_data['blog'])
-        subscriber = self.request.user
-
-        # удаляем из списка подписчиков
-        try:
-            models.Subscribers.objects.get(blog=blog, subscriber=subscriber).delete()
-        except exceptions.ObjectDoesNotExist as a:
-            return render(self.request, 'blog/error.html', {'error': 'Подписки несуществует'})
-        # очищаем ленту
-        models.Feed.objects.filter(subscriber=subscriber, post__author=blog).delete()
-        return redirect(redirect_url)
+    def get_success_url(self):
+        return self.request.POST.get('redirect_url', default='/')
 
 
-class Subscribe(generic.FormView):
-    form_class = SubscribeForm
+class CreateSubscribe(generic.CreateView):
+    model = models.Subscribers
+    fields = ['subscriber', 'blog']
 
-    def form_valid(self, form):
-        redirect_url = self.request.POST.get('redirect_url', default='/')
-        blog = User.objects.get(id=form.cleaned_data['blog'])
-        subscriber = self.request.user
-
-        if models.Subscribers.objects.filter(blog=blog, subscriber=subscriber).exists():
-            return render(self.request, 'blog/error.html', { 'error': "Вы уже подписаны"})
-        try:
-            # добавили в список подписчиков
-            s = models.Subscribers(blog=blog, subscriber=subscriber)
-            s.save()
-
-            # обновили ленту
-            post_list = models.Post.objects.filter(author=blog)
-            for post_ in post_list:
-                models.Feed(subscriber=subscriber, post=post_, is_read=False).save()
-
-
-        except Exception as e:
-            print('===============')
-            print(e)
-            return render(self.request, 'error.html', {'error': e})
-
-        return redirect(redirect_url)
+    def get_success_url(self):
+        return self.request.POST.get('redirect_url', default='/')
 
 
 class ListUsers(generic.ListView):
-    template_name = 'blog\\user_list.html'
+    template_name = 'blog/user_list.html'
 
     def get_queryset(self):
         return User.objects.exclude(id=self.request.user.id)

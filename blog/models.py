@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 
@@ -45,7 +45,23 @@ def on_add_post(sender, **kwargs):
             print(subs.subscriber)
             Feed(post=post, subscriber=subs.subscriber, is_read=False).save()
 
+@receiver(pre_delete, sender=Subscribers)
+def on_unsubscribe(sender, **kwargs):
+    """Обновляем ленту при отписке"""
+    instance = kwargs['instance']
+    Feed.objects.filter(subscriber=instance.subscriber, post__author=instance.blog).delete()
 
+
+
+@receiver(post_save, sender=Subscribers)
+def on_subscribe(sender, **kwargs):
+    """Обновляем ленту при подписке"""
+    if kwargs['created']:
+        instance = kwargs['instance']
+        post_list = Post.objects.filter(author=instance.blog)
+        print(post_list)
+        for post_ in post_list:
+            Feed(subscriber=instance.subscriber, post=post_, is_read=False).save()
 
 
 

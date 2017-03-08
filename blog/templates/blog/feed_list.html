@@ -5,7 +5,10 @@
     <title>Лента</title>
 </head>
 <body>
+{% include "blog/menu_inline.html" %}
+<div id="data">
 {% if not object_list %}
+
 Лента пуста
 
 {% else %}
@@ -20,5 +23,6 @@
 
 </table>
 {% endif %}
+</div>
 </body>
 </html>

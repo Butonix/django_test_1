@@ -1,0 +1,48 @@
+<style>
+
+
+#ti
+{
+
+    display:block;
+    width: 100%;
+}
+#ta
+{
+
+    display:block;
+    width: 100%;
+    height: 300px;
+
+}
+
+.blog_menuitem {
+       display: block;
+
+       width: 100px;
+       padding: 4px;
+       background: #baf;
+       color: #000;
+  }
+
+.blog_menuitem:hover {
+    background: #a8f;
+    color: #ffe;
+   }
+
+#menu{
+    float: left;
+    background: #baf;
+    padding: 10px;
+
+    }
+
+#data{
+    float: left;
+    margin-left: 10px;
+
+    height: 100vh;
+    width: 50%;
+    padding: 10px;
+}
+</style>

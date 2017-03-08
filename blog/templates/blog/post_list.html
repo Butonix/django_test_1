@@ -5,22 +5,26 @@
     <title>Мои посты</title>
 </head>
 <body>
-
-
-<h2><a href="{% url  'blog:new_post' %}">Новый пост</a></h2>
-
-
+{% include "blog/menu_inline.html" %}
+<div id="data">
+<a href="{% url  'blog:new_post' %}">Новый пост</a>
+<hr>
+{% if list_posts %}
 <table border = "0"  cellpadding="2" cellspacing="4" >
  <tr bgcolor="ddaaff">
-    <td>Title</td><td>Date</td>
+    <td>Пост</td><td colspan="2" >Дата</td>
     </tr>
     {% for post in list_posts %}
     <tr>
-    <td><a href ="{% url 'blog:post' post.id %}">{{post.title}}</a> </td><td> {{post.date| date:"d.m.Y H:i:s"}} </td>
+        <td><a href ="{% url 'blog:post' post.id %}">{{post.title}}</a> </td>
+        <td> {{post.date| date:"d.m.Y H:i:s"}} </td>
+        <td><a href="{% url 'blog:delete_post' post.id %}"> удалить </a></td>
     </tr>
     {% endfor %}
-
-
 </table>
+{% else %}
+У вас пока нет постов
+{% endif %}
+</div>
 </body>
 </html>

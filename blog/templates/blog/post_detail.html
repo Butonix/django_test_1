@@ -5,14 +5,14 @@
     <title>Post</title>
 </head>
 <body>
-<a href = "/"> home </a>
-<hr>
+{% include "blog/menu_inline.html" %}
+<div id="data">
 
-<h2>{{post.title}}</h2>
+<h2>{{object.author}}: {{object.title}}</h2>
 <p>
-    {{post.text}}
+    {{object.text}}
 </p>
 
-
+</div>
 </body>
 </html>
