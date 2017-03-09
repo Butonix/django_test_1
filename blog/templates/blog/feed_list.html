@@ -6,23 +6,23 @@
 </head>
 <body>
 {% include "blog/menu_inline.html" %}
+
 <div id="data">
-{% if not object_list %}
-
-Лента пуста
-
-{% else %}
-<table>
-{% for feed in object_list %}
-<tr>
-    <td><a href="{% url 'blog:user' feed.post.author_id %}"> {{feed.post.author}} </a></td>
-    <td><a href="{% url 'blog:post' feed.post.id %}">  {{feed.post.title}} </a></td>
-    <td>    {{feed.post.date| date:"d.m.Y H:i:s"}}</td>
-</tr>
-{% endfor %}
-
-</table>
-{% endif %}
+    {% if not object_list %}
+        Лента пуста
+    {% else %}
+        <table>
+        {% for feed in object_list %}
+        <tr>
+            <td><a href="{% url 'blog:user' feed.post.author_id %}"> {{feed.post.author}} </a></td>
+            <td><a href="{% url 'blog:post' feed.post.id %}">  {{feed.post.title}} </a></td>
+            <td>    {{feed.post.date| date:"d.m.Y H:i:s"}}</td>
+            <td> __ {% if  is_read %} прочитан {% else %} не прочитан {% endif %} </td>
+        </tr>
+        {% endfor %}
+        </table>
+    {% endif %}
 </div>
+
 </body>
 </html>

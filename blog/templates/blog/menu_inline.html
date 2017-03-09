@@ -1,0 +1,9 @@
+{% include 'blog/base.css' %}
+
+<div id = "menu">
+<a class="menu_item" href="{% url 'blog:feed'  %}"> Лента </a>
+<a class="menu_item" href="{% url 'blog:post_list' %}"> Мои посты </a>
+<a class="menu_item" href="{% url 'blog:subscribes' %}"> Подписки </a>
+<a class="menu_item" href="{% url 'blog:users' %}"> Пользователи </a>
+<a class="menu_item" href="{% url 'home' %}"> Назад </a>
+</div>

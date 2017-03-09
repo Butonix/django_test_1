@@ -1,48 +1,94 @@
 <style>
 
+body {
+    background: #000;
+    background: linear-gradient(to right, black 80%, #046);
+    color: #0f0;
+}
 
-#ti
-{
+a {
+    color: #0f0;
 
+}
+
+hr{
+    color: #0f0;
+    background-color: #0f0; /* Цвет линии для браузера Firefox и Opera */
+    height: 2px; /* Толщина линии */
+    border: none;
+}
+
+input[type=submit] {
+    padding:5px 15px;
+    border:1 none;
+    background: transparent;
+    border-color: #0f0;
+    color: #0f0;
+}
+
+input[type=submit]:hover {
+    padding:5px 15px;
+    border:1 none;
+    background: #0F0;
+    border-color: #0F0;
+    color: #000;
+}
+
+{*====================================*}
+.r_form {
+
+     display: inline;
+     margin-left: 20px;
+
+}
+
+
+.menu_item {
+       display: block;
+       width: 100px;
+       padding: 4px;
+       color: #0f0;
+       text-decoration: none;
+}
+
+.menu_item:hover {
+    background: #0f0;
+    color: #000;
+}
+
+
+{*====================================*}
+#parent{
+    border: 1px solid;
+    border-color: #f00;
+    background: #a0f;
+}
+
+#menu {
+    width: 120px;
+    float: left;
+    padding: 10px;
+    border: 1px solid;
+    border-color: #0f0;
+    display: block;
+    height: 100%;
+}
+
+#data {
+    margin-left: 140px;
+
+    padding: 0px  40px  0px  40px;
+}
+
+#ti {
     display:block;
     width: 100%;
 }
-#ta
-{
 
+#ta {
     display:block;
     width: 100%;
     height: 300px;
-
 }
 
-.blog_menuitem {
-       display: block;
-
-       width: 100px;
-       padding: 4px;
-       background: #baf;
-       color: #000;
-  }
-
-.blog_menuitem:hover {
-    background: #a8f;
-    color: #ffe;
-   }
-
-#menu{
-    float: left;
-    background: #baf;
-    padding: 10px;
-
-    }
-
-#data{
-    float: left;
-    margin-left: 10px;
-
-    height: 100vh;
-    width: 50%;
-    padding: 10px;
-}
 </style>

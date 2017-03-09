@@ -1,12 +1,12 @@
 from django.conf.urls import url
-
+from django.contrib.auth.decorators import login_required
 
 from . import views
 
 
 urlpatterns = [
 
-    url(r'^$', views.ListPosts.as_view(), name='post_list'),
+    url(r'^$', login_required(views.ListPosts.as_view(), login_url='/'), name='post_list'),
     url(r'^feed', views.ListFeed.as_view(), name='feed'),
     url(r'^new_post$', views.NewPost.as_view(), name='new_post'),
     url(r'^post/(?P<pk>[0-9]+)$', views.DetailPost.as_view(), name='post'),

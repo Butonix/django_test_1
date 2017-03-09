@@ -7,34 +7,34 @@
 <body>
 {% include "blog/menu_inline.html" %}
 <div id="data">
-{{object}}
+     {{object}}
 
-<hr>
-
-{% if is_subscribed %}
-Вы подписаны
-
-{% else %}
-<form action="{% url 'blog:subscribe' %}" method="post"  >{% csrf_token %}
-    {{subscribe_form}}
-    <input type="hidden" name="redirect_url" value="{{request.path}}"/>
-    <input type="submit" value="Подписаться"/>
-</form>
-{% endif %}
+    {% if subscribe %}
+        <form action="{% url 'blog:delete_subscribe' subscribe.id %}" method="post" class="r_form">{% csrf_token %}
+            <input type="hidden" name="redirect_url" value="{{request.path}}"/>
+            <input type="submit" value="отписаться"/>
+        </form>
+    {% else %}
+        <form action="{% url 'blog:subscribe' %}" method="post" class="r_form" >{% csrf_token %}
+            <input type="hidden" name="blog" value="{{user.id}}"/>
+            <input type="hidden" name="redirect_url" value="{{request.path}}"/>
+            <input type="submit" value="Подписаться"/>
+        </form>
+    {% endif %}
 
 <hr>
 {% if list_posts %}
-<table border = "0"  cellpadding="2" cellspacing="4" >
- <tr bgcolor="ddaaff">
-    <td>Пост</td><td>Дата</td>
-    </tr>
-    {% for post in list_posts %}
-    <tr>
-    <td><a href ="{% url 'blog:post' post.id %}">{{post.title}}</a> </td>
-        <td> {{post.date| date:"d.m.Y H:i:s"}} </td>
-    </tr>
-    {% endfor %}
-</table>
+    Посты:
+    <table >
+        {% for post in list_posts %}
+        <tr>
+            <td>
+            <a href ="{% url 'blog:post' post.id %}">{{post.title}}</a>
+            </td>
+            <td> {{post.date| date:"d.m.Y H:i:s"}} </td>
+         </tr>
+        {% endfor %}
+    </table>
 {% else %}
     У пользователя нет постов
 {% endif %}

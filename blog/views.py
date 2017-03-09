@@ -1,9 +1,15 @@
 from django.views import generic
 from django import forms
 from blog import models
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.models import User
-from django.core import exceptions
+from django.utils.decorators import method_decorator
+
+class ErrorMixin:
+
+    def error(self,  error):
+        return render(self.request, 'blog/error.html', {'error': error})
+
 
 class ListPosts(generic.ListView):
     model = models.Post
@@ -23,11 +29,21 @@ class PostForm(forms.Form):
                            widget=forms.Textarea(attrs={'id': 'ta'}))
 
 
-class DeletePost(generic.DeleteView):
+class DeletePost(generic.DeleteView, ErrorMixin):
     model = models.Post
 
-    def get_success_url(self):
-        return self.request.POST.get('redirect_url', default='/')
+    def delete(self, request, *args, **kwargs):
+        """class DeletionMixin(object).delete() добавил проверку post.author == request.user"""
+        """
+        Calls the delete() method on the fetched object and then
+        redirects to the success URL.
+        """
+        obj = self.get_object()
+        if obj.author == request.user:
+            obj.delete()
+            return redirect(request.POST.get('redirect_url', default='/'))
+        else:
+            return self.error('Вы не можете удалять чужие записи')
 
 
 class NewPost(generic.FormView):
@@ -45,9 +61,6 @@ class NewPost(generic.FormView):
 
     def form_invalid(self, form):
         return render(self.request, 'error.html', {'error': 'ошибки в заполнении формы'})
-
-
-
 
 
 class DetailPost(generic.DetailView):
@@ -68,31 +81,32 @@ class DetailUser(generic.DetailView):
         context = super(generic.DetailView, self).get_context_data(**kwargs)
         user = context['object']
         context['list_posts'] = models.Post.objects.filter(author=user)
-        context['subscribe_form'] = SubscribeForm(initial={'blog': user.id,
-                                                           'subscriber': self.request.user.id})
-        context['is_subscribed'] = models.Subscribers.objects.filter(
-            blog=user, subscriber=self.request.user).exists()
+        if models.Subscribers.objects.filter(blog=user, subscriber=self.request.user).exists():
+            context['subscribe'] = models.Subscribers.objects.get(blog=user, subscriber=self.request.user)
         return context
-
-
-class SubscribeForm(forms.Form):
-    blog = forms.CharField(widget=forms.HiddenInput)
-    subscriber = forms.CharField(widget=forms.HiddenInput)
 
 
 class DeleteSubscribe(generic.DeleteView):
     model = models.Subscribers
 
     def get_success_url(self):
-        return self.request.POST.get('redirect_url', default='/')
+        return self.request.POST.get('redirect_url', default='/blog')
 
 
-class CreateSubscribe(generic.CreateView):
-    model = models.Subscribers
-    fields = ['subscriber', 'blog']
+class CreateSubscribe(generic.View, ErrorMixin):    # лениво использовать form ради одного поля
+                                                    # при том что второе всеравно заполнять из request
+    def post(self, request, *args, **kwargs):
+        subscriber = request.user
+        try:
+            blog_id = int(request.POST['blog'])
+        except (ValueError, KeyError):
+            return self.error('Неверный id блога')
 
-    def get_success_url(self):
-        return self.request.POST.get('redirect_url', default='/')
+        blog = get_object_or_404(User, pk=blog_id)
+        if models.Subscribers.objects.filter(blog=blog, subscriber=subscriber).exists():
+            return self.error('Вы уже подписаны')
+        models.Subscribers(blog=blog, subscriber=subscriber).save()
+        return redirect(request.POST.get('redirect_url', default='/'))
 
 
 class ListUsers(generic.ListView):
@@ -106,8 +120,3 @@ class SubscribesList(generic.ListView):
 
     def get_queryset(self):
         return models.Subscribers.objects.filter(subscriber=self.request.user)
-
-
-
-
-
