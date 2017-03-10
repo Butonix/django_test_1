@@ -91,6 +91,13 @@ class NewPost(generic.FormView):
 class DetailPost(generic.DetailView):
     model = models.Post
 
+    def get_context_data(self, **kwargs):
+        context = super(generic.DetailView, self).get_context_data( **kwargs)
+
+        if models.Feed.objects.filter(subscriber=self.request.user, post=kwargs['object']).exists():
+            context['subscribed'] = True
+            context['is_read'] = models.Feed.objects.get(subscriber=self.request.user, post=kwargs['object']).is_read
+        return context
 
 @set_title('Лента')
 class ListFeed(generic.ListView):
@@ -152,3 +159,14 @@ class SubscribesList(generic.ListView):
         return models.Subscribers.objects.filter(subscriber=self.request.user)
 
 
+class SetRead(generic.View, ErrorMixin):
+
+    def post(self, request):
+        try:
+            post_id = int(request.POST['post_id'])
+        except (ValueError, KeyError):
+            return self.error('Неверный id поста')
+        obj = get_object_or_404(models.Feed, subscriber=request.user, post__id=post_id)
+        obj.is_read = not obj.is_read
+        obj.save()
+        return redirect(request.POST.get('redirect_url', default='/'))

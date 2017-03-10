@@ -10,7 +10,17 @@
             <td><a href="{% url 'blog:user' feed.post.author_id %}"> {{feed.post.author}} </a></td>
             <td><a href="{% url 'blog:post' feed.post.id %}">  {{feed.post.title}} </a></td>
             <td>    {{feed.post.date| date:"d.m.Y H:i:s"}}</td>
-            <td> __ {% if  is_read %} прочитан {% else %} не прочитан {% endif %} </td>
+            <td>
+                <form class="r_fromd" action="{% url 'blog:set_read' %}" method="post" >{% csrf_token %}
+                     <input type="hidden"  name="redirect_url" value="{{request.path}}"/>
+                     <input type="hidden" name="post_id" value = {{feed.post.id}} >
+                    {% if  feed.is_read %}
+                    <input type="submit" value = "Прочитан"/>
+                    {% else %}
+                    <input type="submit" value = "Не прочитан"/>
+                    {% endif %}
+                </form>
+            </td>
         </tr>
         {% endfor %}
         </table>
