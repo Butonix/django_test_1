@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Подтвердите удаление</title>
-</head>
-<body>
-{% include "blog/menu_inline.html" %}
-<div id="data">
+{% extends 'blog/base.html' %}
+{%  block content %}
+
     {{object.title}}: - Удалить?
     <br><br><br>
     <form method ="post" action="{% url 'blog:delete_post' object.id %}">{% csrf_token %}
         <input type="submit" value="Удалить">
         <input type="hidden" name="redirect_url" value="{% url 'blog:post_list' %}"/>
     </form>
-</div>
-</body>
-</html>
+
+{% endblock %}

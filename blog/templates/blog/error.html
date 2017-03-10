@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Error</title>
-</head>
-<body>
-{% include "blog/menu_inline.html" %}
-<div id="data">
+{% extends 'blog/base.html' %}
+{%  block content %}
+
 {{error}}
-</div>
-</body>
-</html>
+
+{% endblock %}

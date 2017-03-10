@@ -1,21 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Пост</title>
-</head>
-<body>
+{% extends 'blog/base.html' %}
+{%  block content %}
 
-
-    {% include "blog/menu_inline.html" %}
-    <div id="data">
         <h2><a href="{% url 'blog:user' object.author.id %}">{{object.author}}</a> : {{object.title}}</h2>
         [Прочитан]
     <p>
         {{object.text}}
     </p>
 
-    </div>
-
-</body>
-</html>
+{% endblock %}

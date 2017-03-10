@@ -5,12 +5,31 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 
+
 class ErrorMixin:
 
     def error(self,  error):
         return render(self.request, 'blog/error.html', {'error': error})
 
 
+def set_title(title):
+    """
+    Создает декоратор, заменющий obj.get_context_data
+    на obj.get_context_data + context['title'] = title
+    """
+    def decorator(obj):
+        tmp = obj.get_context_data
+
+        def wrapper(self, **kwargs):
+            context = tmp(self, **kwargs)
+            context['title'] = title
+            return context
+
+        obj.get_context_data = wrapper
+        return obj
+    return decorator
+
+@set_title('Мои посты')
 class ListPosts(generic.ListView):
     model = models.Post
     context_object_name = 'list_posts'
@@ -46,6 +65,7 @@ class DeletePost(generic.DeleteView, ErrorMixin):
             return self.error('Вы не можете удалять чужие записи')
 
 
+@set_title('Новый пост')
 class NewPost(generic.FormView):
     model = models.Post
     template_name = 'blog/post_form.html'
@@ -62,11 +82,17 @@ class NewPost(generic.FormView):
     def form_invalid(self, form):
         return render(self.request, 'error.html', {'error': 'ошибки в заполнении формы'})
 
+    def get_context_data(self, **kwargs):
+        context = super(generic.FormView, self).get_context_data(**kwargs)
+        return context
 
+
+@set_title('Пост')
 class DetailPost(generic.DetailView):
     model = models.Post
 
 
+@set_title('Лента')
 class ListFeed(generic.ListView):
 
     def get_queryset(self):
@@ -80,9 +106,11 @@ class DetailUser(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(generic.DetailView, self).get_context_data(**kwargs)
         user = context['object']
+        context['title'] = user.username
         context['list_posts'] = models.Post.objects.filter(author=user)
         if models.Subscribers.objects.filter(blog=user, subscriber=self.request.user).exists():
             context['subscribe'] = models.Subscribers.objects.get(blog=user, subscriber=self.request.user)
+
         return context
 
 
@@ -109,6 +137,7 @@ class CreateSubscribe(generic.View, ErrorMixin):    # лениво исполь�
         return redirect(request.POST.get('redirect_url', default='/'))
 
 
+@set_title('Список пользователей')
 class ListUsers(generic.ListView):
     template_name = 'blog/user_list.html'
 
@@ -116,7 +145,10 @@ class ListUsers(generic.ListView):
         return User.objects.exclude(id=self.request.user.id)
 
 
+@set_title('Мои подписки')
 class SubscribesList(generic.ListView):
 
     def get_queryset(self):
         return models.Subscribers.objects.filter(subscriber=self.request.user)
+
+

@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Лента</title>
-</head>
-<body>
-{% include "blog/menu_inline.html" %}
+{% extends 'blog/base.html' %}
+{%  block content %}
 
-<div id="data">
     {% if not object_list %}
         Лента пуста
     {% else %}
@@ -22,7 +15,5 @@
         {% endfor %}
         </table>
     {% endif %}
-</div>
 
-</body>
-</html>
+{% endblock %}

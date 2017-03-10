@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Новый пост</title>
-</head>
-<body>
-{% include "blog/menu_inline.html" %}
-<div id="data">
+{% extends 'blog/base.html' %}
+{%  block content %}
 
     <form method="post" action="{% url 'blog:new_post' %}">{% csrf_token  %}
         {{form.as_p}}
         <input type="hidden" name="redirect_url" value = "{% url 'blog:post_list' %}" />
     <input type="submit" value="Сохранить">
     </form>
-</div>
-</body>
-</html>
+
+{% endblock %}
