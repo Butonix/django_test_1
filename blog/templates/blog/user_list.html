@@ -6,4 +6,18 @@
     <br><br>
 {% endfor %}
 
+ <hr>
+
+{% if paginator.num_pages > 1 %}
+    {% if page_obj.has_previous %}
+        <a href="{% url 'blog:users' page_obj.previous_page_number %}"><=</a>
+    {% endif %}
+
+    {{page_obj.number}} of {{paginator.num_pages}}
+
+    {% if page_obj.has_next %}
+        <a href="{% url 'blog:users' page_obj.next_page_number %}">=></a>
+    {% endif %}
+{% endif %}
+
 {% endblock %}

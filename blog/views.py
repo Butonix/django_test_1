@@ -3,7 +3,6 @@ from django import forms
 from blog import models
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.models import User
-from django.utils.decorators import method_decorator
 
 
 class ErrorMixin:
@@ -28,6 +27,7 @@ def set_title(title):
         obj.get_context_data = wrapper
         return obj
     return decorator
+
 
 @set_title('Мои посты')
 class ListPosts(generic.ListView):
@@ -82,10 +82,6 @@ class NewPost(generic.FormView):
     def form_invalid(self, form):
         return render(self.request, 'error.html', {'error': 'ошибки в заполнении формы'})
 
-    def get_context_data(self, **kwargs):
-        context = super(generic.FormView, self).get_context_data(**kwargs)
-        return context
-
 
 @set_title('Пост')
 class DetailPost(generic.DetailView):
@@ -98,12 +94,6 @@ class DetailPost(generic.DetailView):
             context['subscribed'] = True
             context['is_read'] = models.Feed.objects.get(subscriber=self.request.user, post=kwargs['object']).is_read
         return context
-
-@set_title('Лента')
-class ListFeed(generic.ListView):
-
-    def get_queryset(self):
-        return models.Feed.objects.filter(subscriber=self.request.user)
 
 
 class DetailUser(generic.DetailView):
@@ -121,6 +111,15 @@ class DetailUser(generic.DetailView):
         return context
 
 
+@set_title('Список пользователей')
+class ListUsers(generic.ListView):
+    template_name = 'blog/user_list.html'
+    paginate_by = 7
+
+    def get_queryset(self):
+        return User.objects.exclude(id=self.request.user.id)
+
+
 class DeleteSubscribe(generic.DeleteView):
     model = models.Subscribers
 
@@ -130,7 +129,7 @@ class DeleteSubscribe(generic.DeleteView):
 
 class CreateSubscribe(generic.View, ErrorMixin):    # лениво использовать form ради одного поля
                                                     # при том что второе всеравно заполнять из request
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         subscriber = request.user
         try:
             blog_id = int(request.POST['blog'])
@@ -144,19 +143,19 @@ class CreateSubscribe(generic.View, ErrorMixin):    # лениво исполь�
         return redirect(request.POST.get('redirect_url', default='/'))
 
 
-@set_title('Список пользователей')
-class ListUsers(generic.ListView):
-    template_name = 'blog/user_list.html'
-
-    def get_queryset(self):
-        return User.objects.exclude(id=self.request.user.id)
-
-
 @set_title('Мои подписки')
 class SubscribesList(generic.ListView):
 
     def get_queryset(self):
         return models.Subscribers.objects.filter(subscriber=self.request.user)
+
+
+@set_title('Лента')
+class ListFeed(generic.ListView):
+    paginate_by = 3
+
+    def get_queryset(self):
+        return models.Feed.objects.filter(subscriber=self.request.user)
 
 
 class SetRead(generic.View, ErrorMixin):
