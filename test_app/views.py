@@ -1,8 +1,11 @@
 from django.views import generic
-from django.contrib.auth import login, logout, authenticate
+
 from django.shortcuts import redirect, render
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout, authenticate
+
+from oauth.views import OAuthVk
 
 
 class Main(generic.TemplateView):
@@ -30,7 +33,6 @@ class Login(generic.FormView):
     template_name = 'login_form.html'
 
     def form_valid(self, form):
-        print('++=======LOGIN')
         login_ = form.cleaned_data['login_']
         pass_ = form.cleaned_data['pass_']
         redirect_url = self.request.POST.get('redirect_url', default="/")
@@ -39,8 +41,9 @@ class Login(generic.FormView):
         if user:
             login(self.request, user)
             return redirect(redirect_url)
-        print('dsfsdaf')
-        return render(self.request, 'error.html', {'error': 'неправильные логин/пароль'})  # обработать неправильные данные
+        return render(self.request,  # обработать неправильные данные
+                      'error.html',
+                      {'error': 'неправильные логин/пароль'})
 
 
 class Logout(generic.View):
@@ -51,3 +54,32 @@ class Logout(generic.View):
         print(url_)
         return redirect(url_)
 
+
+class OAuth(generic.View):
+
+    def get(self, request):
+
+        code = request.GET.get('code', default=None)
+        if code:
+            result = OAuthVk.get_token(code)
+            if not result['error']:
+                print('========= Token =============')
+                print(result['token'])
+                print('========= Email =============')
+                print(result['email'])
+            else:
+                return render(request,
+                              'error.html',
+                              {'error': result['error'], 'description': result['description']}
+                              )
+            email = result['email']
+
+            if User.objects.filter(email=email).exists():
+                login(self.request, User.objects.get(email=email))
+            else:
+                new_user = User(username=email, email=email)
+                new_user.save()
+                login(self.request, new_user)
+            return redirect('/')
+        else:
+            return redirect(OAuthVk.code_url)
