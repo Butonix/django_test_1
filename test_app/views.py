@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 
-from oauth.views import OAuthVk
+from oauth.OAuth import OAuthVk
 
 
 class Main(generic.TemplateView):
@@ -58,22 +58,16 @@ class Logout(generic.View):
 class OAuth(generic.View):
 
     def get(self, request):
-
         code = request.GET.get('code', default=None)
         if code:
             result = OAuthVk.get_token(code)
-            if not result['error']:
-                print('========= Token =============')
-                print(result['token'])
-                print('========= Email =============')
-                print(result['email'])
-            else:
+            if result['error']:
                 return render(request,
                               'error.html',
                               {'error': result['error'], 'description': result['description']}
                               )
-            email = result['email']
 
+            email = result['email']
             if User.objects.filter(email=email).exists():
                 login(self.request, User.objects.get(email=email))
             else:
@@ -82,4 +76,4 @@ class OAuth(generic.View):
                 login(self.request, new_user)
             return redirect('/')
         else:
-            return redirect(OAuthVk.code_url)
+            return redirect(OAuthVk.get_code_url())
