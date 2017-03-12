@@ -42,6 +42,9 @@ class OAuthVk:
                 result['error'] = data['error']
                 result['description'] = data['error_description']
                 return result
+            if 'email' not in data:
+                result['error'] = 'Для авторизации требуется доступ к email'
+                return result
             result['token'] = data['access_token']
             result['email'] = data['email']
             result['error'] = None
